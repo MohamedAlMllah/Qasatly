@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Client;
+use App\Http\Resources\clientResource;
+use App\Http\Resources\clientResourceCollection;
 use Illuminate\Http\Request;
 
 class ClientController extends Controller
@@ -12,9 +14,9 @@ class ClientController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(): clientResourceCollection
     {
-        //
+        return new clientResourceCollection(Client::paginate());
     }
 
     /**
@@ -25,7 +27,6 @@ class ClientController extends Controller
     public function create()
     {
         return View('clients.create');
-
     }
 
     /**
@@ -49,7 +50,8 @@ class ClientController extends Controller
         $client->phone = $request->phone;
         $client->address = $request->address;
         $client->save();
-        return redirect()->route('clients.installments.create', $client->id);
+        return new clientResource($client);
+        //return redirect()->route('clients.installments.create', $client->id);
     }
 
     /**
@@ -58,9 +60,9 @@ class ClientController extends Controller
      * @param  \App\Client  $client
      * @return \Illuminate\Http\Response
      */
-    public function show(Client $client)
+    public function show(Client $client): clientResource
     {
-        //
+        return new clientResource($client);
     }
 
     /**
@@ -83,7 +85,19 @@ class ClientController extends Controller
      */
     public function update(Request $request, Client $client)
     {
-        //
+        $request->validate([
+            'name' => 'required|min:3|max:250',
+            'nationalId' => 'required|digits:14',
+            'phone' => 'required|digits:11|starts_with:010,011,012,015',
+            'address' => 'required|min:3|max:250',
+        ]);
+
+        $request->name?$client->full_name = $request->name:"";
+        $request->nationalId?$client->national_id = $request->nationalId:"";
+        $request->phone?$client->phone = $request->phone:"";
+        $request->address?$client->address = $request->address:"";
+        $client->save();
+        return new clientResource($client);
     }
 
     /**
@@ -94,6 +108,7 @@ class ClientController extends Controller
      */
     public function destroy(Client $client)
     {
-        //
+        $client->delete();
+        return response()->json();
     }
 }
