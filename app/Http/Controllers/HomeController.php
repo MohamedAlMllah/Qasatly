@@ -2,6 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Support\Facades\Auth;
+use App\Client;
+use App\Installment;
 use Illuminate\Http\Request;
 
 class HomeController extends Controller
@@ -23,6 +26,7 @@ class HomeController extends Controller
      */
     public function index()
     {
-        return view('home');
+        $installments = Installment::all()->where('created_by', Auth::id())->sortByDesc('updated_at');
+        return view('home', ['installments'  => $installments]);
     }
 }
