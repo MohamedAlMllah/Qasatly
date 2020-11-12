@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Support\Facades\Auth;
 use App\Client;
+use App\Installment;
 use App\Http\Resources\clientResource;
 use App\Http\Resources\clientResourceCollection;
 use Illuminate\Http\Request;
@@ -24,9 +26,9 @@ class ClientController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create()
+    public function create(Installment $installment)
     {
-        return View('clients.create');
+        return View('clients.create', ['installment' => $installment]);
     }
 
     /**
@@ -35,7 +37,7 @@ class ClientController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(Request $request, Installment $installment)
     {
         $request->validate([
             'name' => 'required|min:3|max:250',
@@ -45,13 +47,16 @@ class ClientController extends Controller
         ]);
 
         $client = new Client();
+        $client->created_by = Auth::user()->id;
         $client->full_name = $request->name;
         $client->national_id = $request->nationalId;
         $client->phone = $request->phone;
         $client->address = $request->address;
         $client->save();
-        return new clientResource($client);
-        //return redirect()->route('clients.installments.create', $client->id);
+        $installment->client_id = $client->id;
+        $installment->save();
+        //return new clientResource($client);
+        return redirect()->route('installments.show', $installment->id);
     }
 
     /**

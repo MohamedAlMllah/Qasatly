@@ -21,5 +21,5 @@ Auth::routes();
 
 Route::get('/home', 'HomeController@index')->name('home');
 
-Route::resource('clients', 'ClientController');
-Route::resource('clients.installments', 'InstallmentController');
+Route::resource('installments', 'InstallmentController');
+Route::resource('installments.clients', 'ClientController');

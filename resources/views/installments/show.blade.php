@@ -5,16 +5,15 @@
     <div class="row justify-content-center">
         <div class="col-md-8">
             <div class="card">
-                <div class="card-header">
+                <div class="card-header text-center">
                     <h1> {{$installment->product_name}} </h1>
                 </div>
 
-                <div class="card-body">
-                    <h3> Client Name : {{ $installment->client-> full_name }} </h3>
-                    <h3> product price : {{ $installment-> product_price }} </h3>
-                    <h3> advance payment : {{ $installment-> advance_payment }} </h3>
-                    <h3> cash per {{ $installment-> installment_type }} : {{ $installment-> installment_value }} </h3>
-                    <h3> number of installments : {{ ($installment->product_price - $installment->advance_payment) / $installment->installment_value }} </h3>
+                <div class="card-body text-right">
+                    <h3> سعر المنتج : {{ $installment-> product_price }} جنيه </h3>
+                    <h3> مقدم التقسيط : {{ $installment-> advance_payment }} جنيه </h3>
+                    <h3> قسط {{ $installment-> installment_partition }} : {{ $installment-> installment_value }} جنيه </h3>
+                    <h3> عدد الاقساط : {{ ($installment->product_price - $installment->advance_payment) / $installment->installment_value }} </h3>
                 </div>
             </div>
         </div>

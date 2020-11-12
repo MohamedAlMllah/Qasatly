@@ -15,4 +15,4 @@ use Illuminate\Support\Facades\Route;
 */
 use App\Client;
 //Route::get('/client/{client}','ClientController@show');
-Route::apiResource('clients', 'ClientController');
+//Route::apiResource('clients', 'ClientController');
