@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Support\Facades\Auth;
 use App\Installment;
-use App\Client;
 use Illuminate\Http\Request;
 
 class InstallmentController extends Controller
@@ -23,9 +23,9 @@ class InstallmentController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create(Client $client)
+    public function create()
     {
-        return View('installments.create',['client' => $client]);
+        return View('installments.create');
     }
 
     /**
@@ -34,27 +34,34 @@ class InstallmentController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Client $client, Request $request)
+    public function store(Request $request)
     {
         $request->validate([
             'productName' => 'required|min:3|max:250',
+            'installmentType' => 'required|in:معروض للبيع,مطلوب للشراء',
+            'clientType' => 'required|in:user,offline_client',
             'productPrice' => 'required|numeric',
             'advancePayment' => 'required|numeric',
             'installmentValue' => 'required|numeric',
-            'installmentType' => 'required|in:month,qurter,halfYear,year',
+            'installmentPartition' => 'required|in:شهري,ربع سنوي,نصف سنوي,سنوي',
             'startingDate' => 'required|date'
         ]);
 
         $installment = new Installment();
-        $installment->client_id = $client->id;
+        $installment->created_by = Auth::user()->id;
+        $installment->installment_type = $request->installmentType;
+        $installment->client_type = $request->clientType;
         $installment->product_name = $request->productName;
         $installment->product_price = $request->productPrice;
         $installment->advance_payment = $request->advancePayment;
         $installment->installment_value = $request->installmentValue;
-        $installment->installment_type = $request->installmentType;
+        $installment->installment_partition     = $request->installmentPartition;
         $installment->starting_date = $request->startingDate;
         $installment->save();
-        return redirect()->route('clients.installments.show', [$client->id, $installment->id]);
+        if ($installment->client_type == 'offline_client') {
+        return redirect()->route('installments.clients.create', [$installment->id]);
+        }
+        return redirect()->route('installments.show', [$installment->id]);
     }
 
     /**
@@ -63,9 +70,9 @@ class InstallmentController extends Controller
      * @param  \App\Installment  $installment
      * @return \Illuminate\Http\Response
      */
-    public function show(Client $client, Installment $installment)
+    public function show(Installment $installment)
     {
-        return view('installments.show', ['client' =>  $client, 'installment' =>  $installment]);
+        return view('installments.show', ['installment' =>  $installment]);
     }
 
     /**
